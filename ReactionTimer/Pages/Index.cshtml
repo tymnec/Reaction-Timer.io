@@ -1,0 +1,236 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "";
+}
+
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.9/lottie.min.js"></script>
+    <script src="https://unpkg.com/@@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <script src="https://unpkg.com/@@lottiefiles/lottie-interactivity@latest/dist/lottie-interactivity.min.js"></script>
+</head>
+
+<div class="text-center">
+    <div class="animated-heading row">
+        <div class="col-sm">
+            <h1
+                style="color: white; background-color:rgb(44, 38, 38); border-radius:20px; padding:10px; font-family-serif; margin-top: 1in; user-select:none">
+                Reaction Timer</h1>
+        </div>
+        <div class="col-sm">
+            <lottie-player src="https://assets10.lottiefiles.com/packages/lf20_kblbXu.json" background="transparent"
+                speed="1" style="width: 300px; height: 300px;" loop autoplay></lottie-player>
+        </div>
+    </div>
+</div>
+
+<div class="row nothing">
+    <div class="col shadow-lg"
+        style="border: 2px; border-color: rgba(255, 121, 121, 0.596); border-radius:25px; background-color: rgba(176, 216, 255, 0.521); opacity: 1; margin: 10%">
+        <p id="display" class="displayp">Insert coin</p>
+        @* <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_LDJNxKmoQO.json" background="transparent"
+        speed="1" style="width: 300px; height: 50px;" loop autoplay></lottie-player> *@
+        <button id="coinButton">Insert coin</button>
+        <button id="goStopButton" disabled>Press GO!</button>
+    </div>
+</div>
+
+<style>
+    .animated-heading {
+        position: relative;
+        margin-top: 2rem;
+    }
+
+    .animated-heading h1 {
+        font-size: 4rem;
+        animation: slide-in 1s ease-out;
+        position: relative;
+        display: inline-block;
+    }
+
+    @@keyframes slide-in {
+        from {
+            transform: translateY(-50px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+</style>
+
+<style>
+    .row {
+        display: flex;
+        justify-content: center;
+    }
+
+    .nothing {
+        padding: 20px;
+        border: 2px rgba(255, 135, 135, 0.9);
+        border-radius: 25px;
+        bold background-color: rgba(255, 135, 135, 0.9);
+        box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.15);
+        text-align: center;
+    }
+
+    #display.displayp {
+        font-family: sans-serif;
+        font-size: 32px;
+        color: darkslategray;
+        /* pastel orange */
+        text-align: center;
+        margin: 0;
+        font-weight: bold;
+        padding: 20px;
+        background-color: white;
+        /* pastel yellow */
+        transition: transform 0.2s ease-in-out;
+        border-radius: 25px;
+        margin: 20px;
+        -webkit-user-select: none;
+        /* Safari */
+        -moz-user-select: none;
+        /* Firefox */
+        -ms-user-select: none;
+        /* IE10+/Edge */
+        user-select: none;
+        /* Standard syntax */
+        box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    #display.displayp:hover {
+        transform: scale(1.2);
+        box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.15);
+        transition: 1s;
+    }
+
+    button {
+        font-size: 18px;
+        padding: 10px 20px;
+        background-color: white;
+        color: rgb(58, 35, 35);
+        border: none;
+        border-radius: 20px;
+        outline: none;
+        cursor: pointer;
+        transition: background-color 0.7s ease-in-out, color 0.7s ease-in-out;
+        margin-left: 5%;
+        margin-right: 5%;
+        margin-top: 5%;
+        margin-bottom: 3%;
+        user-select: none;
+    }
+
+    button:hover {
+        background-color: rgba(252, 61, 61, 0.959);
+        color: white;
+        transform: scale(1.2);
+        transition: 0.7s;
+    }
+
+    button:disabled {
+        opacity: 0.5;
+        transform: scale(1);
+    }
+</style>
+
+<script>
+    let display = document.getElementById("display");
+    let coinButton = document.getElementById("coinButton");
+    let goStopButton = document.getElementById("goStopButton");
+
+    let gameRunning = false;
+    let reactionTime = 0;
+    let startTime = 0;
+    let timerInterval;
+    let gamesPlayed = 0;
+    let totalReactionTime = 0;
+
+
+    function startGame() {
+        display.textContent = "Press GO!";
+        goStopButton.disabled = false;
+    }
+
+    function endGame() {
+        if (gameRunning) {
+            clearInterval(timerInterval);
+            gameRunning = false;
+            goStopButton.disabled = true;
+
+            // Update gamesPlayed and totalReactionTime
+            gamesPlayed++;
+            totalReactionTime += reactionTime;
+
+            if (gamesPlayed === 3) {
+                // Calculate average reaction time
+                let averageReactionTime = Math.round(totalReactionTime / gamesPlayed);
+
+                // Display average reaction time for 5 seconds
+                display.textContent = "Average Reaction Time: " + averageReactionTime + " ms";
+                setTimeout(resetGame, 5000);
+            } else {
+                // Display reaction time for 5 seconds
+                display.textContent = "Your Reaction Time: " + reactionTime + " ms";
+                setTimeout(startGame, 5000);
+            }
+
+            goStopButton.textContent = "Press GO!";
+        }
+    }
+
+    function displayResult() {
+        // Display final timer value
+        display.textContent = "Your Reaction Time: " + reactionTime + " ms";
+        // Reset game after 5 seconds
+        setTimeout(resetGame, 5000);
+    }
+
+    function resetGame() {
+        display.textContent = "Insert coin";
+        coinButton.disabled = false;
+        gamesPlayed = 0;
+        totalReactionTime = 0;
+    }
+
+    function startTimer() {
+        goStopButton.disabled = true; // Disable "GO" button
+        let delay = Math.floor(Math.random() * 1500) + 1000; // Random delay between 1 and 2.5 seconds
+        display.textContent = "Wait..."; // Display "wait" message
+        if (display.textContent === "Wait...") {
+            display.innerHTML = `<lottie-player src="https://assets1.lottiefiles.com/packages/lf20_LDJNxKmoQO.json" background="transparent" speed="1" style="width: 100%; height: 100px; object-fit: cover;" loop autoplay></lottie-player>`
+
+        }
+        setTimeout(function () {
+            goStopButton.disabled = false; // Enable "GO" button
+            startTime = new Date().getTime();
+            timerInterval = setInterval(updateTimer, 10);
+        }, delay);
+    }
+
+    function updateTimer() {
+        let currentTime = new Date().getTime();
+        reactionTime = currentTime - startTime;
+        display.textContent = reactionTime + " ms";
+    }
+
+    coinButton.addEventListener("click", function () {
+        display.textContent = "Press GO!";
+        coinButton.disabled = true;
+        goStopButton.disabled = false;
+    });
+
+    goStopButton.addEventListener("click", function () {
+        if (!gameRunning) {
+            gameRunning = true;
+            startTimer();
+            goStopButton.textContent = "STOP";
+            setTimeout(endGame, 5000);
+        } else {
+            endGame();
+        }
+    });
+</script>
